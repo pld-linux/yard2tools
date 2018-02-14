@@ -1,0 +1,29 @@
+--- yard2tools-1.2.5/lirc/lircd_094/Makefile.orig	2018-02-13 18:45:03.058497511 +0100
++++ yard2tools-1.2.5/lirc/lircd_094/Makefile	2018-02-13 21:50:11.445037342 +0100
+@@ -18,18 +18,19 @@
+ CONFIGDIR       ?= $(shell pkg-config --variable=configdir lirc-driver)
+ PLUGINDOCS      ?= $(shell pkg-config --variable=plugindocs lirc-driver)
+ 
+-include $(PLUGINDOCS)/plugindocs.mk
+-
+ $(driver).o: $(driver).c
+ 
+ $(driver).so: $(driver).o
+-	gcc --shared -fpic $(LDFLAGS) -o $@ $<
++	$(CC) --shared -fPIC $(LDFLAGS) -o $@ $<
+ 
+ install: $(driver).so
+-	install $< $(PLUGINDIR)
+-	install $(driver).conf $(CONFIGDIR)
+-	install $(driver).html $(PLUGINDOCS)
+-	$(MAKE) update
++	install -d $(DESTDIR)$(PLUGINDIR) $(DESTDIR)$(CONFIGDIR) $(DESTDIR)$(PLUGINDOCS)
++	install $< $(DESTDIR)$(PLUGINDIR)
++	install $(driver).conf $(DESTDIR)$(CONFIGDIR)
++	-install $(driver).html $(DESTDIR)$(PLUGINDOCS)
++
++post-install-doc:
++	$(MAKE) -C $(PLUGINDOCS) update
+ 
+ clean:
+ 	rm -f *.o *.so
